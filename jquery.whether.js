@@ -19,6 +19,12 @@ jQuery.extend({
                 }
             };
         }
+        function resolveFunc() {
+            var fired = 0;
+            return fired++ ? function(){} : function(value){
+                deferred.resolveWith(deferred,[value]);
+            }
+        }
         function progressFunc(i) {
             return function(value) {
                 pValues[i] = arguments.length > 1 ? sliceDeferred.call(arguments, 0) : value;
@@ -28,7 +34,7 @@ jQuery.extend({
         if (length > 1) {
             for (; i < length; i++) {
                 if (args[i] && args[i].promise && jQuery.isFunction(args[i].promise)) {
-                    args[i].promise().then(deferred.resolve, rejectFunc(i), progressFunc(i));
+                    args[i].promise().then(resolveFunc(), rejectFunc(i), progressFunc(i));
                 } else {
                     --count;
                 }

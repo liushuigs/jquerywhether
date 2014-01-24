@@ -1,8 +1,9 @@
 <!DOCTYPE HTML>
 <html>
 <body>
-<div id="t1">df1,df2都失败时，df才算失败,点击执行</div>
-<div id="t2">df1,df2任何一个成功时，df都算成功,点击执行</div>
+<div type="1">df1,df2都失败</div>
+<div type="2">df1,df2都成功</div>
+<div type="3">df1,df2有一个成功</div>
 <script src="http://code.jquery.com/jquery-1.7.1.js"></script>
 <script src="jquery.whether.js"></script>
 <script type="text/javascript">
@@ -19,23 +20,28 @@
         }).fail(function(){
           console.log('df1 failed');
         });
-        var df = $.whether(df1,df2).then(function(){
-            console.log('at least one defer succeed');
-        }).fail(function(){
+        var df = $.whether(df1,df2).then(function(data){
+            console.log(data);
+            console.log('df success,at least one defer succeed');
+        }).fail(function(data1,data2){
+            console.log(data1);
+            console.log(data2);
             console.log('all failed!');
         });
         if(type == 1){
-            df1.reject();
-            df2.reject();//all failed
+            df1.rejectWith(df1,[{ajaxdata:'fail data from df1'}]);
+            df2.rejectWith(df2,[{ajaxdata:'fail data from df2'}]);//all failed
         }else if(type == 2){
-            df1.resolve();// at least on defer succeed
+            df1.resolveWith(df1,[{ajaxdata:'data from df1'}]);// at least on defer succeed
+            df2.resolveWith(df2,[{ajaxdata:'data from df2'}]);// at least on defer succeed
+        }else if(type == 3){
+            df1.rejectWith(df1,[{ajaxdata:'fail data from df1'}]);
+            df2.resolveWith(df2,[{ajaxdata:'data from df2'}]);// at least on defer succeed
         }
     }
-    $('#t1').click(function(){
-        test(1);
-    });
-    $('#t2').click(function(){
-        test(2);
+    $('div').click(function(){
+        var type = $(this).attr('type');
+        test(type);
     });
 </script>
 </body>
