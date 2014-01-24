@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+<body>
+<div id="t1">df1,df2都失败时，df才算失败,点击执行</div>
+<div id="t2">df1,df2任何一个成功时，df都算成功,点击执行</div>
+<script src="http://code.jquery.com/jquery-1.7.1.js"></script>
+<script src="jquery.whether.js"></script>
+<script type="text/javascript">
+    function test(type){
+        var df1 = $.Deferred();
+        var df2 = $.Deferred();
+        df2.done(function(){
+          console.log('df2 success');
+        }).fail(function(){
+          console.log('df2 failed');
+        });
+        df1.done(function(){
+          console.log('df1 success');
+        }).fail(function(){
+          console.log('df1 failed');
+        });
+        var df = $.whether(df1,df2).then(function(){
+            console.log('at least one defer succeed');
+        }).fail(function(){
+            console.log('all failed!');
+        });
+        if(type == 1){
+            df1.reject();
+            df2.reject();//all failed
+        }else if(type == 2){
+            df1.resolve();// at least on defer succeed
+        }
+    }
+    $('#t1').click(function(){
+        test(1);
+    });
+    $('#t2').click(function(){
+        test(2);
+    });
+</script>
+</body>
+</html>
